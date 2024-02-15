@@ -1,12 +1,115 @@
-import { ethers, run } from 'hardhat';
+import { ethers, run, network } from 'hardhat';
+import { getRegistry } from './get-gegistry';
 import { delay, isHardhatNetwork } from './utils';
 import {
+  QuarterBoxes,
+  QuarterTexts,
   RMRKBulkWriter,
   RMRKCatalogImpl,
   RMRKCatalogUtils,
   RMRKCollectionUtils,
   RMRKEquipRenderUtils,
+  Roadmap,
 } from '../typechain-types';
+
+export async function deployRoadmap(): Promise<Roadmap> {
+  console.log(`Deploying Roadmap to ${network.name} blockchain...`);
+
+  const contractFactory = await ethers.getContractFactory('Roadmap');
+  const args = [
+    'ipfs://TODO/collection',
+    1111n,
+    (await ethers.getSigners())[0].address,
+    300,
+  ] as const;
+
+  const contract: Roadmap = await contractFactory.deploy(...args);
+  await contract.waitForDeployment();
+  const contractAddress = await contract.getAddress();
+  console.log(`Roadmap deployed to ${contractAddress}.`);
+
+  if (!isHardhatNetwork()) {
+    console.log('Waiting 10 seconds before verifying contract...');
+    await delay(10000);
+    await run('verify:verify', {
+      address: contractAddress,
+      constructorArguments: args,
+      contract: 'contracts/Roadmap.sol:Roadmap',
+    });
+
+    // Only do on testing, or if whitelisted for production
+    const registry = await getRegistry();
+    await registry.addExternalCollection(contractAddress, args[0]);
+    console.log('Collection added to Singular Registry');
+  }
+  return contract;
+}
+
+export async function deployQuarterBoxes(): Promise<QuarterBoxes> {
+  console.log(`Deploying QuarterBoxes to ${network.name} blockchain...`);
+
+  const contractFactory = await ethers.getContractFactory('QuarterBoxes');
+  const args = [
+    'ipfs://TODO/collection',
+    1111n,
+    (await ethers.getSigners())[0].address,
+    300,
+  ] as const;
+
+  const contract: QuarterBoxes = await contractFactory.deploy(...args);
+  await contract.waitForDeployment();
+  const contractAddress = await contract.getAddress();
+  console.log(`QuarterBoxes deployed to ${contractAddress}.`);
+
+  if (!isHardhatNetwork()) {
+    console.log('Waiting 10 seconds before verifying contract...');
+    await delay(10000);
+    await run('verify:verify', {
+      address: contractAddress,
+      constructorArguments: args,
+      contract: 'contracts/QuarterBoxes.sol:QuarterBoxes',
+    });
+
+    // Only do on testing, or if whitelisted for production
+    const registry = await getRegistry();
+    await registry.addExternalCollection(contractAddress, args[0]);
+    console.log('Collection added to Singular Registry');
+  }
+  return contract;
+}
+
+export async function deployQuarterTexts(): Promise<QuarterTexts> {
+  console.log(`Deploying QuarterTexts to ${network.name} blockchain...`);
+
+  const contractFactory = await ethers.getContractFactory('QuarterTexts');
+  const args = [
+    'ipfs://TODO/collection',
+    1111n,
+    (await ethers.getSigners())[0].address,
+    300,
+  ] as const;
+
+  const contract: QuarterTexts = await contractFactory.deploy(...args);
+  await contract.waitForDeployment();
+  const contractAddress = await contract.getAddress();
+  console.log(`QuarterTexts deployed to ${contractAddress}.`);
+
+  if (!isHardhatNetwork()) {
+    console.log('Waiting 10 seconds before verifying contract...');
+    await delay(10000);
+    await run('verify:verify', {
+      address: contractAddress,
+      constructorArguments: args,
+      contract: 'contracts/QuarterTexts.sol:QuarterTexts',
+    });
+
+    // Only do on testing, or if whitelisted for production
+    const registry = await getRegistry();
+    await registry.addExternalCollection(contractAddress, args[0]);
+    console.log('Collection added to Singular Registry');
+  }
+  return contract;
+}
 
 export async function deployBulkWriter(): Promise<RMRKBulkWriter> {
   const bulkWriterFactory = await ethers.getContractFactory('RMRKBulkWriter');

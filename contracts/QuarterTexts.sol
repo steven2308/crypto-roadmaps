@@ -2,20 +2,22 @@
 
 pragma solidity ^0.8.21;
 
+import {QuarterBase} from "./abstracts/QuarterBase.sol";
 import {
-    RMRKEquippablePreMint
-} from "@rmrk-team/evm-contracts/contracts/implementations/premint/RMRKEquippablePreMint.sol";
+    RMRKImplementationBase
+} from "@rmrk-team/evm-contracts/contracts/implementations/utils/RMRKImplementationBase.sol";
 
-contract SimpleEquippable is RMRKEquippablePreMint {
+contract QuarterTexts is QuarterBase {
+    // Constructor
     constructor(
         string memory collectionMetadata,
         uint256 maxSupply,
         address royaltyRecipient,
         uint16 royaltyPercentageBps
     )
-        RMRKEquippablePreMint(
-            "SimpleEquippable",
-            "SE",
+        RMRKImplementationBase(
+            "QuarterTexts",
+            "QTX",
             collectionMetadata,
             maxSupply,
             royaltyRecipient,
