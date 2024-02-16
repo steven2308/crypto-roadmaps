@@ -11,6 +11,7 @@ import {
   RMRKEquipRenderUtils,
   Roadmap,
 } from '../typechain-types';
+import * as C from './constants';
 
 export async function deployRoadmap(): Promise<Roadmap> {
   console.log(`Deploying Roadmap to ${network.name} blockchain...`);
@@ -187,4 +188,255 @@ async function verifyIfNotHardhat(contractAddress: string, args: any[] = []) {
   } catch (error) {
     // probably already verified
   }
+}
+
+export async function configureQuarterBoxesAssets(boxes: QuarterBoxes, roadmap: Roadmap) {
+  console.log('Configuring QuarterBoxes...');
+  const q1_asset_ids = Array.from(
+    { length: C.TOTAL_ASSETS_PER_CHILDREN_COLLECTION },
+    (_, i) => i + 1,
+  );
+  const q2_asset_ids = Array.from(
+    { length: C.TOTAL_ASSETS_PER_CHILDREN_COLLECTION },
+    (_, i) => C.TOTAL_ASSETS_PER_CHILDREN_COLLECTION + i + 1,
+  );
+  const q3_asset_ids = Array.from(
+    { length: C.TOTAL_ASSETS_PER_CHILDREN_COLLECTION },
+    (_, i) => C.TOTAL_ASSETS_PER_CHILDREN_COLLECTION * 2 + i + 1,
+  );
+  const q4_asset_ids = Array.from(
+    { length: C.TOTAL_ASSETS_PER_CHILDREN_COLLECTION },
+    (_, i) => C.TOTAL_ASSETS_PER_CHILDREN_COLLECTION * 3 + i + 1,
+  );
+
+  const q1_assets = q1_asset_ids.map((id) => `${C.Q1_BOX_BASE_URI}${id}.json`);
+  const q2_assets = q2_asset_ids.map((id) => `${C.Q2_BOX_BASE_URI}${id}.json`);
+  const q3_assets = q3_asset_ids.map((id) => `${C.Q3_BOX_BASE_URI}${id}.json`);
+  const q4_assets = q4_asset_ids.map((id) => `${C.Q4_BOX_BASE_URI}${id}.json`);
+
+  let tx = await boxes.batchAddEquippableAssetEntries(q1_assets, C.Q1_BOX_SLOT_ID);
+  await tx.wait();
+  tx = await boxes.batchAddEquippableAssetEntries(q2_assets, C.Q2_BOX_SLOT_ID);
+  await tx.wait();
+  tx = await boxes.batchAddEquippableAssetEntries(q3_assets, C.Q3_BOX_SLOT_ID);
+  await tx.wait();
+  tx = await boxes.batchAddEquippableAssetEntries(q4_assets, C.Q4_BOX_SLOT_ID);
+  await tx.wait();
+  console.log('Assets added to boxes for each quarter.');
+
+  tx = await boxes.setValidAssets(q1_asset_ids, 1);
+  await tx.wait();
+  tx = await boxes.setValidAssets(q2_asset_ids, 1);
+  await tx.wait();
+  tx = await boxes.setValidAssets(q3_asset_ids, 1);
+  await tx.wait();
+  tx = await boxes.setValidAssets(q4_asset_ids, 1);
+  await tx.wait();
+  console.log('Assets set as valid for each quarter.');
+
+  tx = await boxes.setValidParentForEquippableGroup(
+    C.Q1_BOX_SLOT_ID,
+    await roadmap.getAddress(),
+    C.Q1_BOX_SLOT_ID,
+  );
+  await tx.wait();
+  tx = await boxes.setValidParentForEquippableGroup(
+    C.Q2_BOX_SLOT_ID,
+    await roadmap.getAddress(),
+    C.Q2_BOX_SLOT_ID,
+  );
+  await tx.wait();
+  tx = await boxes.setValidParentForEquippableGroup(
+    C.Q3_BOX_SLOT_ID,
+    await roadmap.getAddress(),
+    C.Q3_BOX_SLOT_ID,
+  );
+  await tx.wait();
+  tx = await boxes.setValidParentForEquippableGroup(
+    C.Q4_BOX_SLOT_ID,
+    await roadmap.getAddress(),
+    C.Q4_BOX_SLOT_ID,
+  );
+  await tx.wait();
+  console.log('Parents set as valid for each quarter.');
+
+  console.log('QuarterBoxes configured.');
+}
+
+export async function configureQuarterTextsAssets(texts: QuarterTexts, roadmap: Roadmap) {
+  console.log('Configuring QuarterTexts...');
+  const q1_asset_ids = Array.from(
+    { length: C.TOTAL_ASSETS_PER_CHILDREN_COLLECTION },
+    (_, i) => i + 1,
+  );
+  const q2_asset_ids = Array.from(
+    { length: C.TOTAL_ASSETS_PER_CHILDREN_COLLECTION },
+    (_, i) => C.TOTAL_ASSETS_PER_CHILDREN_COLLECTION + i + 1,
+  );
+  const q3_asset_ids = Array.from(
+    { length: C.TOTAL_ASSETS_PER_CHILDREN_COLLECTION },
+    (_, i) => C.TOTAL_ASSETS_PER_CHILDREN_COLLECTION * 2 + i + 1,
+  );
+  const q4_asset_ids = Array.from(
+    { length: C.TOTAL_ASSETS_PER_CHILDREN_COLLECTION },
+    (_, i) => C.TOTAL_ASSETS_PER_CHILDREN_COLLECTION * 3 + i + 1,
+  );
+
+  const q1_assets = q1_asset_ids.map((id) => `${C.Q1_TEXT_BASE_URI}${id}.json`);
+  const q2_assets = q2_asset_ids.map((id) => `${C.Q2_TEXT_BASE_URI}${id}.json`);
+  const q3_assets = q3_asset_ids.map((id) => `${C.Q3_TEXT_BASE_URI}${id}.json`);
+  const q4_assets = q4_asset_ids.map((id) => `${C.Q4_TEXT_BASE_URI}${id}.json`);
+
+  let tx = await texts.batchAddEquippableAssetEntries(q1_assets, C.Q1_TEXT_SLOT_ID);
+  await tx.wait();
+  tx = await texts.batchAddEquippableAssetEntries(q2_assets, C.Q2_TEXT_SLOT_ID);
+  await tx.wait();
+  tx = await texts.batchAddEquippableAssetEntries(q3_assets, C.Q3_TEXT_SLOT_ID);
+  await tx.wait();
+  tx = await texts.batchAddEquippableAssetEntries(q4_assets, C.Q4_TEXT_SLOT_ID);
+  await tx.wait();
+  console.log('Assets added to texts for each quarter.');
+
+  tx = await texts.setValidAssets(q1_asset_ids, 1);
+  await tx.wait();
+  tx = await texts.setValidAssets(q2_asset_ids, 1);
+  await tx.wait();
+  tx = await texts.setValidAssets(q3_asset_ids, 1);
+  await tx.wait();
+  tx = await texts.setValidAssets(q4_asset_ids, 1);
+  await tx.wait();
+  console.log('Assets set as valid for each quarter.');
+
+  tx = await texts.setValidParentForEquippableGroup(
+    C.Q1_TEXT_SLOT_ID,
+    await roadmap.getAddress(),
+    C.Q1_TEXT_SLOT_ID,
+  );
+  await tx.wait();
+  tx = await texts.setValidParentForEquippableGroup(
+    C.Q2_TEXT_SLOT_ID,
+    await roadmap.getAddress(),
+    C.Q2_TEXT_SLOT_ID,
+  );
+  await tx.wait();
+  tx = await texts.setValidParentForEquippableGroup(
+    C.Q3_TEXT_SLOT_ID,
+    await roadmap.getAddress(),
+    C.Q3_TEXT_SLOT_ID,
+  );
+  await tx.wait();
+  tx = await texts.setValidParentForEquippableGroup(
+    C.Q4_TEXT_SLOT_ID,
+    await roadmap.getAddress(),
+    C.Q4_TEXT_SLOT_ID,
+  );
+  await tx.wait();
+  console.log('Parents set as valid for each quarter.');
+
+  console.log('QuarterTexts configured.');
+}
+
+export async function configureCatalog(
+  boxesAddress: string,
+  textsAddress: string,
+  catalog: RMRKCatalogImpl,
+) {
+  console.log('Configuring Catalog...');
+  const tx = await catalog.addPartList([
+    {
+      partId: C.Q1_BOX_SLOT_ID,
+      part: {
+        itemType: C.PART_TYPE_SLOT,
+        z: C.BOX_Z_INDEX,
+        equippable: [boxesAddress],
+        metadataURI: C.Q1_BOX_SLOT_METADATA,
+      },
+    },
+    {
+      partId: C.Q2_BOX_SLOT_ID,
+      part: {
+        itemType: C.PART_TYPE_SLOT,
+        z: C.BOX_Z_INDEX,
+        equippable: [boxesAddress],
+        metadataURI: C.Q2_BOX_SLOT_METADATA,
+      },
+    },
+    {
+      partId: C.Q3_BOX_SLOT_ID,
+      part: {
+        itemType: C.PART_TYPE_SLOT,
+        z: C.BOX_Z_INDEX,
+        equippable: [boxesAddress],
+        metadataURI: C.Q3_BOX_SLOT_METADATA,
+      },
+    },
+    {
+      partId: C.Q4_BOX_SLOT_ID,
+      part: {
+        itemType: C.PART_TYPE_SLOT,
+        z: C.BOX_Z_INDEX,
+        equippable: [boxesAddress],
+        metadataURI: C.Q4_BOX_SLOT_METADATA,
+      },
+    },
+    {
+      partId: C.Q1_TEXT_SLOT_ID,
+      part: {
+        itemType: C.PART_TYPE_SLOT,
+        z: C.BOX_Z_INDEX,
+        equippable: [textsAddress],
+        metadataURI: C.Q1_TEXT_SLOT_METADATA,
+      },
+    },
+    {
+      partId: C.Q2_TEXT_SLOT_ID,
+      part: {
+        itemType: C.PART_TYPE_SLOT,
+        z: C.BOX_Z_INDEX,
+        equippable: [textsAddress],
+        metadataURI: C.Q2_TEXT_SLOT_METADATA,
+      },
+    },
+    {
+      partId: C.Q3_TEXT_SLOT_ID,
+      part: {
+        itemType: C.PART_TYPE_SLOT,
+        z: C.BOX_Z_INDEX,
+        equippable: [textsAddress],
+        metadataURI: C.Q3_TEXT_SLOT_METADATA,
+      },
+    },
+    {
+      partId: C.Q4_TEXT_SLOT_ID,
+      part: {
+        itemType: C.PART_TYPE_SLOT,
+        z: C.BOX_Z_INDEX,
+        equippable: [textsAddress],
+        metadataURI: C.Q4_TEXT_SLOT_METADATA,
+      },
+    },
+  ]);
+  await tx.wait();
+  console.log('Catalog configured.');
+}
+
+export async function addRoadMapAsset(roadmap: Roadmap, catalogAddress: string) {
+  console.log('Adding Roadmap asset...');
+  const tx = await roadmap.addEquippableAssetEntry(
+    C.PARENT_EQUIPPABLE_GROUP_ID,
+    catalogAddress,
+    C.MAIN_ROADMAP_ASSET_METADATA_URI,
+    [
+      C.Q1_BOX_SLOT_ID,
+      C.Q2_BOX_SLOT_ID,
+      C.Q3_BOX_SLOT_ID,
+      C.Q4_BOX_SLOT_ID,
+      C.Q1_TEXT_SLOT_ID,
+      C.Q2_TEXT_SLOT_ID,
+      C.Q3_TEXT_SLOT_ID,
+      C.Q4_TEXT_SLOT_ID,
+    ],
+  );
+  await tx.wait();
+  console.log('Roadmap asset added.');
 }

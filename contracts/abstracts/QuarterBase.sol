@@ -25,7 +25,7 @@ abstract contract QuarterBase is RMRKAbstractEquippable {
     // Variables
     uint256 private _contractURIFrozen; // Cheaper than a bool
     uint256 private _seedBitShift;
-    uint64[] private _validAssets;
+    mapping(uint8 quarter => uint64[] assetIds) private _validAssets;
 
     // Methods
     function tokenURI(uint256 tokenId) public view returns (string memory) {
@@ -82,19 +82,23 @@ abstract contract QuarterBase is RMRKAbstractEquippable {
      * @dev The "data" value of the "_safeMint" method is set to an empty value.
      * @dev Can only be called while the open sale is open.
      * @param to Address of the collection smart contract of the token into which to mint the child token
+     * @param quarter Quarter of the token to mint, used to pick the random asset
      * @param destinationId ID of the token into which to mint the new child token
      * @return tokenId The ID of the first token to be minted in the current minting cycle
      * @return assetId The ID of the asset added to the token
      */
     function nestMintWithRandomAsset(
         address to,
+        uint8 quarter,
         uint256 destinationId
     ) public onlyOwnerOrContributor returns (uint256 tokenId, uint64 assetId) {
         (tokenId, ) = _prepareMint(1);
 
         _nestMint(to, tokenId, destinationId, "");
-        assetId = _validAssets[
-            block.prevrandao >> _seedBitShift % _validAssets.length
+        assetId = _validAssets[quarter][
+            block.prevrandao >>
+                (_seedBitShift * quarter) %
+                _validAssets[quarter].length
         ];
         _addAssetToToken(tokenId, assetId, 0);
         // First asset is auto accepted
@@ -112,8 +116,10 @@ abstract contract QuarterBase is RMRKAbstractEquippable {
         return _seedBitShift;
     }
 
-    function getValidAssets() external view returns (uint64[] memory) {
-        return _validAssets;
+    function getValidAssets(
+        uint8 quarter
+    ) external view returns (uint64[] memory) {
+        return _validAssets[quarter];
     }
 
     /**
@@ -139,11 +145,14 @@ abstract contract QuarterBase is RMRKAbstractEquippable {
         _seedBitShift = seedBitShift_;
     }
 
-    function setValidAssets(uint64[] memory validAssets) external onlyOwner {
-        delete _validAssets;
+    function setValidAssets(
+        uint64[] memory validAssets,
+        uint8 quarter
+    ) external onlyOwner {
+        delete _validAssets[quarter];
         uint256 length = validAssets.length;
         for (uint256 i = 0; i < length; i++) {
-            _validAssets.push(validAssets[i]);
+            _validAssets[quarter].push(validAssets[i]);
         }
     }
 }

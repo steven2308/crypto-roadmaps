@@ -29,15 +29,8 @@ contract Roadmap is RMRKAbstractEquippable {
     struct EquippableChildConfig {
         address childAddress;
         uint8 slotPartId;
+        uint8 quarter;
     }
-
-    // struct IntakeEquip {
-    //     uint256 tokenId;
-    //     uint256 childIndex;
-    //     uint64 assetId;
-    //     uint64 slotPartId;
-    //     uint64 childAssetId;
-    // }
 
     // Variables
     mapping(address => bool) private _autoAcceptCollection;
@@ -122,7 +115,11 @@ contract Roadmap is RMRKAbstractEquippable {
         for (uint256 i; i < length; ) {
             EquippableChildConfig memory config = _equippableChildConfig[i];
             (, uint64 childAssetId) = IMintWithRandomAsset(config.childAddress)
-                .nestMintWithRandomAsset(address(this), tokenId);
+                .nestMintWithRandomAsset(
+                    address(this),
+                    config.quarter,
+                    tokenId
+                );
             IntakeEquip memory intakeEquip = IntakeEquip({
                 tokenId: tokenId,
                 childIndex: i,
